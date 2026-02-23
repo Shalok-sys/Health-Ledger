@@ -23,7 +23,9 @@ import {
 export default function SelectClinician() {
   const navigate = useNavigate();
   const { activeRole, triggerRefresh } = useRole();
-  const [pendingClinicianId, setPendingClinicianId] = useState<string | null>(null);
+  const [pendingClinicianId, setPendingClinicianId] = useState<string | null>(
+    null,
+  );
 
   const patientId = getPatientIdFromRole(activeRole);
   if (!patientId) {
@@ -34,7 +36,9 @@ export default function SelectClinician() {
   const patient = getPatientById(patientId);
   const clinicians = getClinicians();
   const existingRelationships = getCareRelationshipsByPatient(patientId);
-  const pendingClinician = pendingClinicianId ? clinicians.find((c) => c.id === pendingClinicianId) : null;
+  const pendingClinician = pendingClinicianId
+    ? clinicians.find((c) => c.id === pendingClinicianId)
+    : null;
 
   function handleConfirmConsent() {
     if (!pendingClinicianId) return;
@@ -46,45 +50,56 @@ export default function SelectClinician() {
 
   return (
     <PageShell title="Select a Clinician">
-      <p className="text-muted-foreground mb-8 max-w-lg">
-        Choosing a clinician starts a care relationship. They will be <strong>locked</strong> to your care
-        and must contribute observations before they can access your history.
+      <p className="text-muted-foreground mb-6 sm:mb-8 max-w-lg text-sm sm:text-base">
+        Choosing a clinician starts a care relationship. They will be{" "}
+        <strong>locked</strong> to your care and must contribute observations
+        before they can access your history.
       </p>
 
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {clinicians.map((clinician) => {
           // Get all relationships with this clinician, sorted newest first
           const clinicianRels = existingRelationships
             .filter((r) => r.clinicianId === clinician.id)
-            .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+            .sort(
+              (a, b) =>
+                new Date(b.startDate).getTime() -
+                new Date(a.startDate).getTime(),
+            );
           const latestRel = clinicianRels[0];
           const hasActiveRel = latestRel?.status === "active";
-          const hasCompletedRel = clinicianRels.some((r) => r.status === "completed");
+          const hasCompletedRel = clinicianRels.some(
+            (r) => r.status === "completed",
+          );
 
           return (
             <div
               key={clinician.id}
-              className="bg-card border rounded-lg p-6 flex items-center justify-between"
+              className="bg-card border rounded-lg p-4 sm:p-6 flex items-center justify-between"
             >
-              <div className="flex items-center gap-4">
-                <div className="p-2 rounded-lg bg-secondary">
-                  <Stethoscope className="h-6 w-6 text-secondary-foreground" />
+              <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+                <div className="p-2 rounded-lg bg-secondary flex-shrink-0">
+                  <Stethoscope className="h-5 w-5 sm:h-6 sm:w-6 text-secondary-foreground" />
                 </div>
-                <div>
-                  <h3 className="font-semibold">{clinician.name}</h3>
-                  <p className="text-sm text-muted-foreground">{clinician.specialty}</p>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-semibold text-base sm:text-lg truncate">
+                    {clinician.name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {clinician.specialty}
+                  </p>
                 </div>
               </div>
 
               {hasActiveRel ? (
-                <span className="inline-flex items-center gap-1.5 text-sm text-locked-foreground font-medium">
+                <span className="inline-flex items-center gap-1.5 text-sm text-locked-foreground font-medium flex-shrink-0 ml-2">
                   <Clock className="h-4 w-4" />
                   Care Active
                 </span>
               ) : (
                 <button
                   onClick={() => setPendingClinicianId(clinician.id)}
-                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg font-medium hover:opacity-90 transition-opacity text-sm sm:text-base flex-shrink-0 ml-2"
                 >
                   <Plus className="h-4 w-4" />
                   {hasCompletedRel ? "Start New Care" : "Start Care"}
@@ -96,32 +111,54 @@ export default function SelectClinician() {
       </div>
 
       {/* CONSENT DIALOG */}
-      <AlertDialog open={!!pendingClinicianId} onOpenChange={(open) => !open && setPendingClinicianId(null)}>
-        <AlertDialogContent>
+      <AlertDialog
+        open={!!pendingClinicianId}
+        onOpenChange={(open) => !open && setPendingClinicianId(null)}
+      >
+        <AlertDialogContent className="mx-4">
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-warning" />
+            <AlertDialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
               Confirm History Sharing
             </AlertDialogTitle>
             <AlertDialogDescription asChild>
-              <div className="space-y-3">
+              <div className="space-y-3 text-sm sm:text-base">
                 <p>
-                  You are about to share your clinical history with <strong className="text-foreground">{pendingClinician?.name}</strong>.
+                  You are about to share your clinical history with{" "}
+                  <strong className="text-foreground">
+                    {pendingClinician?.name}
+                  </strong>
+                  .
                 </p>
                 <ul className="text-sm space-y-1.5 list-disc pl-4">
-                  <li>Your full history will be visible to this clinician once they contribute observations</li>
-                  <li>The clinician will be locked to your care until they submit observations</li>
-                  <li>This action cannot be undone — past access remains even after care ends</li>
+                  <li>
+                    Your full history will be visible to this clinician once
+                    they contribute observations
+                  </li>
+                  <li>
+                    The clinician will be locked to your care until they submit
+                    observations
+                  </li>
+                  <li>
+                    This action cannot be undone — past access remains even
+                    after care ends
+                  </li>
                 </ul>
                 <p className="font-medium text-foreground">
-                  Do you consent to sharing your history with {pendingClinician?.name}?
+                  Do you consent to sharing your history with{" "}
+                  {pendingClinician?.name}?
                 </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmConsent}>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
+            <AlertDialogCancel className="w-full sm:w-auto">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmConsent}
+              className="w-full sm:w-auto"
+            >
               I Consent — Start Care
             </AlertDialogAction>
           </AlertDialogFooter>

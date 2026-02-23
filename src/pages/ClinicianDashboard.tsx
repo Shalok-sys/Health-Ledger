@@ -12,8 +12,18 @@ import {
 } from "@/data/store";
 import { Input } from "@/components/ui/input";
 import {
-  Lock, FileText, Plus, Clock, CheckCircle2, ShieldAlert,
-  Users, Search, ChevronDown, ChevronUp, History, EyeOff,
+  Lock,
+  FileText,
+  Plus,
+  Clock,
+  CheckCircle2,
+  ShieldAlert,
+  Users,
+  Search,
+  ChevronDown,
+  ChevronUp,
+  History,
+  EyeOff,
 } from "lucide-react";
 
 export default function ClinicianDashboard() {
@@ -22,7 +32,9 @@ export default function ClinicianDashboard() {
   const clinicianId = getClinicianIdFromRole(activeRole);
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedPatientId, setExpandedPatientId] = useState<string | null>(null);
+  const [expandedPatientId, setExpandedPatientId] = useState<string | null>(
+    null,
+  );
 
   if (!clinicianId) {
     navigate("/");
@@ -34,7 +46,9 @@ export default function ClinicianDashboard() {
   const activeRelationship = getActiveCareRelationship(clinicianId);
   const ownObservations = getObservationsByClinician(clinicianId);
 
-  const completedRelationships = relationships.filter((r) => r.status === "completed");
+  const completedRelationships = relationships.filter(
+    (r) => r.status === "completed",
+  );
   const isLocked = !!activeRelationship;
 
   // Deduplicate by patientId — one entry per patient, tracking all their sessions
@@ -62,60 +76,77 @@ export default function ClinicianDashboard() {
     <PageShell title="Clinician Dashboard">
       <div className="max-w-3xl">
         {/* ACTIVE CARE BANNER */}
-        {activeRelationship && (() => {
-          const patient = getPatientById(activeRelationship.patientId);
-          return (
-            <div className="bg-locked border-2 border-locked-border rounded-lg p-6 mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <Lock className="h-6 w-6 text-locked-foreground" />
-                <h2 className="text-xl font-bold text-locked-foreground">Active Care — Locked</h2>
+        {activeRelationship &&
+          (() => {
+            const patient = getPatientById(activeRelationship.patientId);
+            return (
+              <div className="bg-locked border-2 border-locked-border rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
+                <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                  <Lock className="h-5 w-5 sm:h-6 sm:w-6 text-locked-foreground" />
+                  <h2 className="text-lg sm:text-xl font-bold text-locked-foreground">
+                    Active Care — Locked
+                  </h2>
+                </div>
+                <p className="text-locked-foreground mb-3 sm:mb-4 text-sm sm:text-base">
+                  You are assigned to <strong>{patient?.name}</strong>. You must
+                  submit observations to complete this care relationship.
+                </p>
+                {!activeRelationship.observationsAdded && (
+                  <ul className="text-xs sm:text-sm text-locked-foreground space-y-1 mb-4 sm:mb-5">
+                    <li>
+                      • You <strong>cannot</strong> browse other patients
+                    </li>
+                    <li>
+                      • You <strong>must</strong> add clinical observations
+                      first
+                    </li>
+                    <li>• Care ends after you submit observations</li>
+                  </ul>
+                )}
+                <button
+                  onClick={() =>
+                    navigate(
+                      `/clinician/add-observations/${activeRelationship.id}`,
+                    )
+                  }
+                  className="inline-flex items-center gap-2 bg-warning text-warning-foreground px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-bold hover:opacity-90 transition-opacity w-full justify-center text-sm sm:text-base"
+                >
+                  <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
+                  Add Patient Observations
+                </button>
               </div>
-              <p className="text-locked-foreground mb-4">
-                You are assigned to <strong>{patient?.name}</strong>. You must submit observations to complete this care relationship.
-              </p>
-              {!activeRelationship.observationsAdded && (
-                <ul className="text-sm text-locked-foreground space-y-1 mb-5">
-                  <li>• You <strong>cannot</strong> browse other patients</li>
-                  <li>• You <strong>must</strong> add clinical observations first</li>
-                  <li>• Care ends after you submit observations</li>
-                </ul>
-              )}
-              <button
-                onClick={() => navigate(`/clinician/add-observations/${activeRelationship.id}`)}
-                className="inline-flex items-center gap-2 bg-warning text-warning-foreground px-6 py-3 rounded-lg font-bold hover:opacity-90 transition-opacity w-full justify-center"
-              >
-                <Plus className="h-5 w-5" />
-                Add Patient Observations
-              </button>
-            </div>
-          );
-        })()}
+            );
+          })()}
 
         {/* NO ACTIVE CARE */}
         {!activeRelationship && relationships.length === 0 && (
-          <div className="bg-secondary border rounded-lg p-8 text-center mb-8">
-            <ShieldAlert className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">No Patients Yet</h2>
-            <p className="text-muted-foreground">
-              You have no patient relationships. A patient must select you to start care.
+          <div className="bg-secondary border rounded-lg p-6 sm:p-8 text-center mb-6 sm:mb-8">
+            <ShieldAlert className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-3 sm:mb-4" />
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">
+              No Patients Yet
+            </h2>
+            <p className="text-muted-foreground text-sm sm:text-base">
+              You have no patient relationships. A patient must select you to
+              start care.
             </p>
           </div>
         )}
 
         {!activeRelationship && relationships.length > 0 && (
-          <div className="bg-accent border border-primary/20 rounded-lg p-5 mb-8 flex items-center gap-3">
-            <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+          <div className="bg-accent border border-primary/20 rounded-lg p-4 sm:p-5 mb-6 sm:mb-8 flex items-center gap-2 sm:gap-3">
+            <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
             <p className="text-sm text-accent-foreground">
-              You are available for new patients. Waiting for a patient to request care.
+              You are available for new patients. Waiting for a patient to
+              request care.
             </p>
           </div>
         )}
 
         {/* MY PATIENTS SECTION */}
-        <section className="mb-10">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
-              <Users className="h-5 w-5" />
+        <section className="mb-8 sm:mb-10">
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
+              <Users className="h-4 w-4 sm:h-5 sm:w-5" />
               My Patients
             </h2>
             {isLocked && (
@@ -128,13 +159,13 @@ export default function ClinicianDashboard() {
 
           {/* Search — only visible when unlocked and has completed patients */}
           {!isLocked && uniquePatients.length > 0 && (
-            <div className="relative mb-4">
+            <div className="relative mb-3 sm:mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search patients by name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
+                className="pl-9 h-9 sm:h-10"
               />
             </div>
           )}
@@ -142,42 +173,54 @@ export default function ClinicianDashboard() {
           {relationships.length === 0 ? (
             <p className="text-muted-foreground text-sm">No patients yet.</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {/* Active relationship card */}
-              {activeRelationship && (() => {
-                const patient = getPatientById(activeRelationship.patientId);
-                return (
-                  <div className="bg-card border-2 border-locked-border rounded-lg p-5">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold">{patient?.name}</h3>
-                        <p className="text-xs text-muted-foreground">
-                          Started: {new Date(activeRelationship.startDate).toLocaleDateString()}
-                        </p>
+              {activeRelationship &&
+                (() => {
+                  const patient = getPatientById(activeRelationship.patientId);
+                  return (
+                    <div className="bg-card border-2 border-locked-border rounded-lg p-4 sm:p-5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold">{patient?.name}</h3>
+                          <p className="text-xs text-muted-foreground">
+                            Started:{" "}
+                            {new Date(
+                              activeRelationship.startDate,
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-locked-foreground">
+                          <Clock className="h-4 w-4" />
+                          Active — Awaiting Observations
+                        </span>
                       </div>
-                      <span className="inline-flex items-center gap-1 text-sm font-medium text-locked-foreground">
-                        <Clock className="h-4 w-4" />
-                        Active — Awaiting Observations
-                      </span>
                     </div>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
 
               {/* One card per unique patient, with all their sessions' observations */}
               {filteredPatients.map(([patientId, sessions]) => {
                 const patient = getPatientById(patientId);
                 // All observations across all sessions with this patient
-                const allPatientObs = ownObservations.filter((o) => o.patientId === patientId);
+                const allPatientObs = ownObservations.filter(
+                  (o) => o.patientId === patientId,
+                );
                 const isExpanded = expandedPatientId === patientId;
                 // Most recent session for header date display
                 const latestSession = sessions.sort(
-                  (a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+                  (a, b) =>
+                    new Date(b.startDate).getTime() -
+                    new Date(a.startDate).getTime(),
                 )[0];
                 // For history, use the most recent completed session's relationship ID
                 // so the cutoff is scoped to that session
                 const visibleHistory = isExpanded
-                  ? getVisibleHistoryForClinician(patientId, clinicianId, latestSession.id)
+                  ? getVisibleHistoryForClinician(
+                      patientId,
+                      clinicianId,
+                      latestSession.id,
+                    )
                   : [];
 
                 return (
@@ -195,8 +238,12 @@ export default function ClinicianDashboard() {
                         <div>
                           <h3 className="font-semibold">{patient?.name}</h3>
                           <p className="text-xs text-muted-foreground">
-                            Last care: {new Date(latestSession.startDate).toLocaleDateString()}
-                            {sessions.length > 1 && ` · ${sessions.length} sessions`}
+                            Last care:{" "}
+                            {new Date(
+                              latestSession.startDate,
+                            ).toLocaleDateString()}
+                            {sessions.length > 1 &&
+                              ` · ${sessions.length} sessions`}
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
@@ -205,7 +252,9 @@ export default function ClinicianDashboard() {
                               <CheckCircle2 className="h-4 w-4" />
                               Completed
                             </span>
-                            <p className="text-xs text-muted-foreground mt-1">{allPatientObs.length} observation(s)</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {allPatientObs.length} observation(s)
+                            </p>
                           </div>
                           {isExpanded ? (
                             <ChevronUp className="h-5 w-5 text-muted-foreground" />
@@ -230,11 +279,16 @@ export default function ClinicianDashboard() {
                         </div>
 
                         {visibleHistory.length === 0 ? (
-                          <p className="text-sm text-muted-foreground italic">No history available.</p>
+                          <p className="text-sm text-muted-foreground italic">
+                            No history available.
+                          </p>
                         ) : (
                           <ul className="space-y-2">
                             {visibleHistory.map((entry, i) => (
-                              <li key={i} className="text-sm bg-card border rounded p-3">
+                              <li
+                                key={i}
+                                className="text-sm bg-card border rounded p-3"
+                              >
                                 {entry}
                               </li>
                             ))}
@@ -243,7 +297,9 @@ export default function ClinicianDashboard() {
 
                         <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
                           <EyeOff className="h-3 w-3" />
-                          <span>History after your observation is not visible</span>
+                          <span>
+                            History after your observation is not visible
+                          </span>
                         </div>
 
                         {/* All observations across all sessions with this patient */}
@@ -254,19 +310,49 @@ export default function ClinicianDashboard() {
                               Your Observations
                             </h4>
                             {allPatientObs.map((obs) => (
-                              <div key={obs.id} className="bg-card border rounded p-3 mb-2">
+                              <div
+                                key={obs.id}
+                                className="bg-card border rounded p-3 mb-2"
+                              >
                                 <p className="text-xs text-muted-foreground mb-2">
                                   {new Date(obs.createdAt).toLocaleString()}
                                 </p>
                                 <div className="grid grid-cols-2 gap-1 text-sm">
-                                  <div><span className="text-muted-foreground">Domain:</span> {obs.observationDomain}</div>
-                                  <div><span className="text-muted-foreground">Anatomy:</span> {obs.anatomicalContext}</div>
-                                  <div><span className="text-muted-foreground">Trigger:</span> {obs.triggerCondition}</div>
-                                  <div><span className="text-muted-foreground">Measure:</span> {obs.measurementType}</div>
-                                  <div><span className="text-muted-foreground">Confidence:</span> {obs.confidenceLevel}</div>
+                                  <div>
+                                    <span className="text-muted-foreground">
+                                      Domain:
+                                    </span>{" "}
+                                    {obs.observationDomain}
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">
+                                      Anatomy:
+                                    </span>{" "}
+                                    {obs.anatomicalContext}
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">
+                                      Trigger:
+                                    </span>{" "}
+                                    {obs.triggerCondition}
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">
+                                      Measure:
+                                    </span>{" "}
+                                    {obs.measurementType}
+                                  </div>
+                                  <div>
+                                    <span className="text-muted-foreground">
+                                      Confidence:
+                                    </span>{" "}
+                                    {obs.confidenceLevel}
+                                  </div>
                                 </div>
                                 {obs.notes && (
-                                  <p className="text-sm text-muted-foreground mt-2 italic">"{obs.notes}"</p>
+                                  <p className="text-sm text-muted-foreground mt-2 italic">
+                                    "{obs.notes}"
+                                  </p>
                                 )}
                               </div>
                             ))}
@@ -280,7 +366,9 @@ export default function ClinicianDashboard() {
 
               {/* No search results */}
               {!isLocked && searchQuery && filteredPatients.length === 0 && (
-                <p className="text-sm text-muted-foreground italic">No patients match "{searchQuery}".</p>
+                <p className="text-sm text-muted-foreground italic">
+                  No patients match "{searchQuery}".
+                </p>
               )}
             </div>
           )}
@@ -289,4 +377,3 @@ export default function ClinicianDashboard() {
     </PageShell>
   );
 }
-
