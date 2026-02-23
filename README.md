@@ -597,4 +597,4 @@ This prototype was built to test a specific incentive model for healthcare data 
 
 ---
 
-**Final Note**: This is a **behavior-first prototype**. The focus is on demonstrating that the incentive model _works_—that clinicians are willing to contribute when access is tied to contribution, and that patients benefit from the resulting data richness. Infrastructure hardening is left to production teams, but the core incentive mechanics are validated here.
+**Final Note**: This is a **behavior-first prototype**. The focus is on demonstrating that the incentive model _works_—that clinicians are willing to contribute when access is tied to contribution, and that patients benefit from the resulting data richness. Infrastructure hardening is left to production stage, but the core incentive mechanics are validated here.
