@@ -115,7 +115,7 @@ export default function SelectClinician() {
         open={!!pendingClinicianId}
         onOpenChange={(open) => !open && setPendingClinicianId(null)}
       >
-        <AlertDialogContent className="mx-4">
+        <AlertDialogContent className="mx-2 max-w-[90vw] sm:mx-4 sm:max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2 text-base sm:text-lg">
               <ShieldAlert className="h-4 w-4 sm:h-5 sm:w-5 text-warning" />
